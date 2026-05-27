@@ -1,3 +1,18 @@
+import sys
+import pandas as pd
+
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+
+from src.logger import logging
+from src.exception import CustomException
+
+from src.utils import (
+    evaluate_models,
+    save_object
+)
+
+
 class ModelTrainer:
 
     model_path = "artifacts/model.pkl"
