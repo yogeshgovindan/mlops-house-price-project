@@ -3,11 +3,20 @@ import pandas as pd
 import mlflow
 import mlflow.sklearn
 
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import (
+    LinearRegression
+)
+
+from sklearn.ensemble import (
+    RandomForestRegressor
+)
 
 from src.logger import logging
-from src.exception import CustomException
+
+from src.exception import (
+    CustomException
+)
+
 from src.utils import (
     evaluate_models,
     save_object
@@ -35,7 +44,7 @@ class ModelTrainer:
             )
 
             # ------------------------
-            # Load Data
+            # Load Train/Test Data
             # ------------------------
             train_df = pd.read_csv(
                 train_path
@@ -54,7 +63,9 @@ class ModelTrainer:
             )
 
             X_train = train_df.drop(
-                columns=[target_column]
+                columns=[
+                    target_column
+                ]
             )
 
             y_train = train_df[
@@ -62,7 +73,9 @@ class ModelTrainer:
             ]
 
             X_test = test_df.drop(
-                columns=[target_column]
+                columns=[
+                    target_column
+                ]
             )
 
             y_test = test_df[
@@ -73,13 +86,14 @@ class ModelTrainer:
             # Define Models
             # ------------------------
             models = {
+
                 "Linear Regression":
-                    LinearRegression(),
+                LinearRegression(),
 
                 "Random Forest":
-                    RandomForestRegressor(
-                        random_state=42
-                    )
+                RandomForestRegressor(
+                    random_state=42
+                )
             }
 
             logging.info(
@@ -100,11 +114,12 @@ class ModelTrainer:
             )
 
             logging.info(
-                f"Model Report: {model_report}"
+                f"Model Report: "
+                f"{model_report}"
             )
 
             # ------------------------
-            # Select Best Model
+            # Best Model Selection
             # ------------------------
             best_model_name = max(
                 model_report,
@@ -122,7 +137,13 @@ class ModelTrainer:
             ]
 
             logging.info(
-                f"Best model: {best_model_name}"
+                f"Best Model: "
+                f"{best_model_name}"
+            )
+
+            logging.info(
+                f"Best Model Score: "
+                f"{best_model_score}"
             )
 
             # ------------------------
@@ -160,18 +181,23 @@ class ModelTrainer:
                 # ------------------------
                 # Log Model
                 # ------------------------
-                model_info = (
-                    mlflow.sklearn.log_model(
-                        sk_model=best_model,
-                        name="house_price_model"
-                    )
+                mlflow.sklearn.log_model(
+                    sk_model=best_model,
+                    artifact_path="model"
                 )
 
                 # ------------------------
                 # Register Model
                 # ------------------------
+                model_uri = (
+                    f"runs:/"
+                    f"{mlflow.active_run().info.run_id}"
+                    f"/model"
+                )
+
                 mlflow.register_model(
-                    model_uri=model_info.model_uri,
+                    model_uri=model_uri,
+
                     name="house_price_model"
                 )
 
@@ -180,10 +206,11 @@ class ModelTrainer:
             )
 
             # ------------------------
-            # Save Best Model Locally
+            # Save Local Model
             # ------------------------
             save_object(
                 file_path=self.model_path,
+
                 obj=best_model
             )
 
