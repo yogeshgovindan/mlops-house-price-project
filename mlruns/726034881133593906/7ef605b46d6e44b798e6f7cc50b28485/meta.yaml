@@ -1,0 +1,15 @@
+artifact_uri: file:E:\mlops_houseprice_project\mlruns/726034881133593906/7ef605b46d6e44b798e6f7cc50b28485/artifacts
+end_time: 1780161033142
+entry_point_name: ''
+experiment_id: '726034881133593906'
+lifecycle_stage: active
+run_id: 7ef605b46d6e44b798e6f7cc50b28485
+run_name: Random Forest
+run_uuid: 7ef605b46d6e44b798e6f7cc50b28485
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780161011497
+status: 3
+tags: []
+user_id: HP
