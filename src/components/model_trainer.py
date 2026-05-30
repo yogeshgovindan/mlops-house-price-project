@@ -1,8 +1,8 @@
 import sys
+import os
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-import os
 
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
@@ -17,24 +17,20 @@ class ModelTrainer:
     def __init__(self):
         self.model_path = "artifacts/model.pkl"
 
-        # ✅ FIX 1: MLflow safe path (IMPORTANT FOR CI/CD)
-        mlflow.set_tracking_uri(
-            os.getenv("MLFLOW_TRACKING_URI", "mlruns")
-        )
+        # ✅ FIX 1: FORCE SAFE CROSS-PLATFORM PATH (IMPORTANT)
+        self.mlflow_uri = os.path.join(os.getcwd(), "mlruns")
+        mlflow.set_tracking_uri(self.mlflow_uri)
 
     def initiate_model_training(self, train_path, test_path):
 
         try:
-
             logging.info("Entered Model Training")
 
             # ------------------------
-            # Load Data
+            # Load data
             # ------------------------
             train_df = pd.read_csv(train_path)
             test_df = pd.read_csv(test_path)
-
-            logging.info("Train and test data loaded")
 
             target_column = "median_house_value"
 
@@ -60,36 +56,33 @@ class ModelTrainer:
                 models
             )
 
-            logging.info(f"Model Report: {model_report}")
-
-            # ------------------------
-            # Best Model
-            # ------------------------
             best_model_name = max(model_report, key=model_report.get)
             best_model_score = model_report[best_model_name]
             best_model = models[best_model_name]
 
             logging.info(f"Best Model: {best_model_name}")
-            logging.info(f"Best Model Score: {best_model_score}")
+            logging.info(f"Best Score: {best_model_score}")
 
             # ------------------------
-            # MLflow tracking
+            # 🔥 MLflow FIX START (IMPORTANT)
             # ------------------------
+
+            # Force experiment creation safely
             mlflow.set_experiment("house_price_prediction")
 
             with mlflow.start_run(run_name=best_model_name):
 
-                mlflow.log_param("best_model", best_model_name)
-                mlflow.log_param("random_state", 42)
-
+                mlflow.log_param("model", best_model_name)
                 mlflow.log_metric("r2_score", best_model_score)
 
+                # Log model safely
                 mlflow.sklearn.log_model(
                     sk_model=best_model,
                     artifact_path="model"
                 )
 
-                model_uri = f"runs:/{mlflow.active_run().info.run_id}/model"
+                run_id = mlflow.active_run().info.run_id
+                model_uri = f"runs:/{run_id}/model"
 
                 mlflow.register_model(
                     model_uri=model_uri,
@@ -106,8 +99,7 @@ class ModelTrainer:
                 obj=best_model
             )
 
-            logging.info("Best model saved locally")
-            logging.info("Model training completed")
+            logging.info("Model saved successfully")
 
             return best_model_score
 
