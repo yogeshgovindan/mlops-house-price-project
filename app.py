@@ -1,20 +1,23 @@
+from src.api.api_logger import (
+    logger
+)
+from src.api.exception_handler import (
+    global_exception_handler
+)
+from src.schema.prediction_schema import (
+    HouseData
+)
 from fastapi import FastAPI
 import pandas as pd
 import pickle
 import time
 import uuid
 
-from src.schema.prediction_schema import (
-    HouseData
-)
+import os
+import joblib
 
-from src.api.exception_handler import (
-    global_exception_handler
-)
-
-from src.api.api_logger import (
-    logger
-)
+MODEL_PATH = os.path.join("artifacts", "model.pkl")
+model = joblib.load(MODEL_PATH)
 
 
 # ------------------------
