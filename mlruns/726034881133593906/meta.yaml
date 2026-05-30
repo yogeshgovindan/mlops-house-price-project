@@ -1,0 +1,6 @@
+artifact_location: file:E:\mlops_houseprice_project\mlruns/726034881133593906
+creation_time: 1780157240266
+experiment_id: '726034881133593906'
+last_update_time: 1780157240266
+lifecycle_stage: active
+name: house_price_prediction

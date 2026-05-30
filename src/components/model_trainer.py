@@ -15,11 +15,17 @@ from src.utils import evaluate_models, save_object
 class ModelTrainer:
 
     def __init__(self):
-        self.model_path = "artifacts/model.pkl"
 
-        # ✅ FIX 1: FORCE SAFE CROSS-PLATFORM PATH (IMPORTANT)
-        self.mlflow_uri = os.path.join(os.getcwd(), "mlruns")
-        mlflow.set_tracking_uri(self.mlflow_uri)
+        # ----------------------------
+        # ✅ CLEAN MLflow CONFIG (ONLY ONCE)
+        # ----------------------------
+        self.base_dir = os.path.abspath(".")
+        self.mlflow_path = os.path.join(self.base_dir, "mlruns")
+
+        # IMPORTANT: single source of truth
+        mlflow.set_tracking_uri(f"file:{self.mlflow_path}")
+
+        self.model_path = "artifacts/model.pkl"
 
     def initiate_model_training(self, train_path, test_path):
 
@@ -64,10 +70,8 @@ class ModelTrainer:
             logging.info(f"Best Score: {best_model_score}")
 
             # ------------------------
-            # 🔥 MLflow FIX START (IMPORTANT)
+            # MLflow Tracking (CLEAN)
             # ------------------------
-
-            # Force experiment creation safely
             mlflow.set_experiment("house_price_prediction")
 
             with mlflow.start_run(run_name=best_model_name):
@@ -75,7 +79,6 @@ class ModelTrainer:
                 mlflow.log_param("model", best_model_name)
                 mlflow.log_metric("r2_score", best_model_score)
 
-                # Log model safely
                 mlflow.sklearn.log_model(
                     sk_model=best_model,
                     artifact_path="model"
